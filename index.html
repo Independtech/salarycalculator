@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+    <link rel="stylesheet" href="styles.css">
+    <title>Salary calculator</title>
+</head>
+
+<body>
+    <div class="flex items-center justify-center">
+
+        <div class="flex flex-col p-4 gap-2">
+            <h1>Lönekalkylator</h1>
+            <div class="flex flex-col card">
+                <h2>Intäkter / Debitering</h2>
+                <div class="flex flex-wrap">
+                    <label for="timmar">Debiterade timmar</label>
+                    <div>
+                        <input id="timmar" type="number" value="160" min="0" class="pill">
+                        <span class="ps-1">h/månad</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="timarvode">Timarvode</label>
+                    <div>
+                        <input id="timarvode" type="number" value="1000" min="0" class="pill">
+                        <span class="ps-1">kr</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="monthlyIncome">Månadsintäkt</label>
+                    <span id="monthlyIncome"></span>
+                </div>
+                <h2>Löneuttag / Andra utgifter</h2>
+                <div class="flex flex-wrap">
+                    <label for="bruttolön">Bruttolön</label>
+                    <div>
+                        <input id="bruttolön" type="number" value="55000" min="0" class="pill">
+                        <span>kr/månad</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="arbetsgivaravgift">Arbetsgivaravgift</label>
+                    <span id="arbetsgivaravgift"></span>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="pension">Pension</label>
+                    <div>
+
+                        <input id="pension" type="number" value="3000" min="0" class="pill">
+                        <span>kr/månad</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="pensionTax">Skatt för pension</label>
+                    <span id="pensionTax"></span>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="totalMonthlyCost">Total kostnad (löneuttag + pension)</label>
+                    <span id="totalMonthlyCost"></span>
+                </div>
+                <div class="flex flex-wrap">
+                    <label for="remaining">Kvar i potten varje månad</label>
+                    <span id="remaining"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById("bruttolön").addEventListener("change", () => {
+            updateArbetsgivaravgift();
+            updateTotalCost();
+        });
+
+        function addKr(input) {
+            return `${input} kr`
+        }
+
+        function updateArbetsgivaravgift() {
+            const bruttolön = document.getElementById("bruttolön").value;
+            const arbetsgivaravgift = bruttolön * 0.3142;
+            document.getElementById("arbetsgivaravgift").innerText = addKr(arbetsgivaravgift.toFixed(2));
+        }
+
+        document.getElementById("timmar").addEventListener("change", updateMonthlyIncome);
+        document.getElementById("timarvode").addEventListener("change", updateMonthlyIncome);
+        function updateMonthlyIncome() {
+            const timdebitering = document.getElementById("timmar").value;
+            const timarvode = document.getElementById("timarvode").value;
+            const debitering = timdebitering * timarvode;
+            const monthlyIncome = debitering * 0.7;
+            document.getElementById("monthlyIncome").innerText = addKr(monthlyIncome.toFixed(2));
+            updateRemaining();
+        }
+
+        document.getElementById("pension").addEventListener("change", () => {
+            updatePensionTax();
+            updateTotalCost();
+        });
+
+        function updatePensionTax() {
+            const pension = document.getElementById("pension").value;
+            const pensionTax = pension * 0.2426;
+            document.getElementById("pensionTax").innerText = addKr(pensionTax.toFixed(2));
+        }
+
+        function updateTotalCost() {
+            const bruttolön = document.getElementById("bruttolön").value;
+            const arbetsgivaravgift = bruttolön * 0.3142;
+            const pension = document.getElementById("pension").value;
+            const pensionTax = document.getElementById("pensionTax").textContent;
+            const totalMonthlyCost = Number(bruttolön) + parseFloat(arbetsgivaravgift) + Number(pension) + parseFloat(pensionTax);
+            document.getElementById("totalMonthlyCost").innerText = addKr(totalMonthlyCost.toFixed(2));
+            updateRemaining();
+        }
+
+        function updateRemaining() {
+            const totalMonthlyCost = document.getElementById("totalMonthlyCost").textContent;
+            const monthlyIncome = document.getElementById("monthlyIncome").textContent;
+            const remaining = parseFloat(monthlyIncome) - parseFloat(totalMonthlyCost);
+            document.getElementById("remaining").innerText = addKr(remaining.toFixed(2));
+        }
+
+        updateArbetsgivaravgift();
+        updateMonthlyIncome();
+        updatePensionTax();
+        updateTotalCost();
+        updateRemaining();
+    </script>
+</body>
+
+</html>
